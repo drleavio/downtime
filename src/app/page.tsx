@@ -5,9 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Activity, Bell, BarChart3, Zap, CheckCircle, ArrowRight, Globe } from "lucide-react"
-import { DialogDemo } from "@/component/modal"
-import { useContext } from "react"
-import StepContext from "@/store/useStore"
+import Navigation from "@/component/navigation"
 
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },
@@ -29,50 +27,9 @@ const scaleOnHover = {
 }
 
 export default function HomePage() {
-  const context = useContext(StepContext)
-  const open = context?.open ?? false
-  const setOpen = context?.setOpen ?? (() => {})
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <motion.header
-        className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <motion.div className="flex items-center space-x-2" whileHover={{ scale: 1.05 }}>
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Activity className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold font-[var(--font-work-sans)] text-foreground">downtime</span>
-          </motion.div>
-
-          <nav className="hidden md:flex items-center space-x-8">
-            {[
-              { name: "Features", href: "/features" },
-              { name: "Pricing", href: "/pricing" },
-              { name: "About", href: "/about" },
-              { name: "Support", href: "/support" },
-            ].map((item) => (
-              <motion.a
-                key={item.name}
-                href={item.href}
-                className="text-muted-foreground hover:text-foreground transition-colors font-[var(--font-open-sans)]"
-                whileHover={{ y: -2 }}
-              >
-                {item.name}
-              </motion.a>
-            ))}
-          </nav>
-
-          <motion.div {...scaleOnHover}>
-           <DialogDemo open={open} setOpen={setOpen}/>
-          </motion.div>
-        </div>
-      </motion.header>
-
+      <Navigation/>
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-accent/5">
         <div className="container mx-auto px-4 py-20 lg:py-32">
@@ -141,7 +98,7 @@ export default function HomePage() {
 
         {/* Animated background elements */}
         <motion.div
-          className="absolute top-20 left-10 w-20 h-20 bg-primary/10 rounded-full"
+          className="absolute top-20 left-10 w-20 h-20 bg-green-200 rounded-full"
           animate={{
             y: [0, -20, 0],
             opacity: [0.3, 0.6, 0.3],
@@ -314,7 +271,7 @@ export default function HomePage() {
           </div>
 
           <div className="mt-8 pt-8 border-t border-border text-center text-sm text-muted-foreground font-[var(--font-open-sans)]">
-            © 2024 downtime. All rights reserved.
+            © {new Date().getFullYear()} downtime. All rights reserved.
           </div>
         </div>
       </footer>

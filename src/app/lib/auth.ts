@@ -2,9 +2,10 @@ import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import User from "@/schema/UserSchema";
+import User from "../../schema/UserSchema";
 import type { NextAuthOptions } from "next-auth";
 import type { JWT } from "next-auth/jwt";
+import { dbConnect } from "@/dbConnect/dbConnect";
 
 
 declare module "next-auth" {
@@ -30,7 +31,7 @@ export const NEXT_AUTH: NextAuthOptions = {
 
   providers: [
     CredentialsProvider({
-      name: "Credentials",
+      name: "credentials",
       credentials: {
         email: { label: "Email", type: "email", placeholder: "Enter your email" },
         password: { label: "Password", type: "password", placeholder: "Enter your password" },
@@ -69,26 +70,39 @@ export const NEXT_AUTH: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     }),
   ],
+  pages:{
+    signIn:"/login"
+  },
 
   callbacks: {
 
-      async signIn({ user, account, profile }) {
-      if (account?.provider === "google" || account?.provider === "github") {
-        const existingUser = await User.findOne({ email: user.email });
+    async signIn({ user, account }) {
+  await dbConnect(); // ensure DB connected
 
-        if (!existingUser) {
-          const newUser = new User({
-            email: user.email,
-            name: user.name,
-            image: user.image,
-            password: null, // since OAuth doesn’t provide passwords
-          });
-          await newUser.save();
-        }
+  if (account?.provider === "google" || account?.provider === "github") {
+    const email = user.email?.toLowerCase();
+    const existingUser = await User.findOne({ email });
+    console.log("Existing user:", existingUser);
+
+    if (!existingUser) {
+      try {
+        const newUser = new User({
+          email,
+          name: user.name,
+          image: user.image,
+          password: null,
+        });
+        await newUser.save();
+        console.log("New user created:", existingUser);
+      } catch (err) {
+        console.error("Error saving user:", err);
       }
-      return true; // allow sign in
-    },
-    
+    }
+  }
+
+  return true;
+},
+
     async session({ session, token }) {
       if (session.user && token) {
         session.user.id = token.sub ?? "";

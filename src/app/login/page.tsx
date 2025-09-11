@@ -1,9 +1,17 @@
 "use client"
 import { useSession } from 'next-auth/react'
-import React from 'react'
+import { useRouter } from 'next/navigation'
+
+import React, { useEffect } from 'react'
 
 const Page = () => {
-    const session = useSession()
+    const { data: session } = useSession();
+  const router = useRouter();
+   useEffect(() => {
+    if (session?.user) {
+      router.push("/dashboard");
+    }
+  }, [session, router]);
   return (
     <div className='bg-red-500'>
         {JSON.stringify(session)}

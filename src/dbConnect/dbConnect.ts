@@ -3,7 +3,13 @@ import { NextResponse } from "next/server";
 
 export const dbConnect=async()=>{
     try {
-        await mongoose.connect("");
+        const mongoUri = process.env.MONGO_URI;
+        if (!mongoUri) {
+            throw new Error("MONGO_URI environment variable is not defined");
+        }
+        await mongoose.connect(mongoUri);
+        console.log("connected");
+        
         // You can check connection state if needed:
         // if (mongoose.connection.readyState === 1) {
         //     // Connected
